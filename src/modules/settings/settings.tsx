@@ -44,7 +44,7 @@ export function Settings() {
 
         const isImageChanged = data.image !== `${API_BASE_URL}/${user.image}`;
 
-        const body: any = {
+        const body: IUserForm = {
             name: data.name,
             username: data.username,
             surname: data.surname,

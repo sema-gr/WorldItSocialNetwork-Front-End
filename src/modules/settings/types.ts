@@ -1,12 +1,12 @@
 export interface IUserForm {
-    id: number;
+    // id: number;
     name?: string;
     username?: string;
     surname?: string;
     dateOfBirth?: Date;
     email: string;
-    newPassword: string;
-    oldPassword: string;
+    newPassword?: string;
+    oldPassword?: string;
     signature?: string;
     image?: string;
 }

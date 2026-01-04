@@ -7,7 +7,6 @@ import D from "../icons/logo/d";
 import I from "../icons/logo/i";
 import T from "../icons/logo/t";
 import { styles } from "./header.styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
