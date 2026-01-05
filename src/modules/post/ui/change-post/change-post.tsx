@@ -412,7 +412,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                                     fontSize: 16,
                                     backgroundColor: "#f9f9f9",
                                 }}
-                                placeholder="Опис публікації*"
+                                placeholder="Опис публікації"
                                 value={text}
                                 onChangeText={setText}
                                 multiline

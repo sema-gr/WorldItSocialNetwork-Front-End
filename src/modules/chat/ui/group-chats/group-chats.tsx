@@ -6,6 +6,7 @@ import { useChats } from "../../hooks/useChats";
 import { useRouter } from "expo-router";
 import { styles } from "./group-chats.style";
 import { Chat } from "../../types/socket";
+import { ChatGroupIcon } from "../../../../shared/ui/icons/groupChats";
 
 export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
     const { user } = useUserContext();
@@ -28,7 +29,7 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
     const content = (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Image source={require("../../../../shared/ui/images/chat.png")} />
+                <ChatGroupIcon style={{ width: 20, height: 20 }} />
                 <Text style={styles.title}>Групові чати</Text>
             </View>
 

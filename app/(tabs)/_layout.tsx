@@ -1,135 +1,105 @@
 import { Tabs } from "expo-router";
-import { Image } from "react-native";
-import { useState } from "react";
+import { Image, View } from "react-native";
 import { Header } from "../../src/shared/ui/header";
 import { styles } from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Home from "../../src/shared/ui/icons/footer-home-button";
+import HomeIcon from "../../src/shared/ui/icons/home";
+import MyPub from "../../src/shared/ui/icons/my-pub";
+import FriendsIcon from "../../src/shared/ui/icons/friends";
+import ChatsMain from "../../src/shared/ui/icons/chats-main";
 
 export default function TabsLayout() {
-    const [isHomeActive, setIsHomeActive] = useState(true);
-    const [isMyPostsActive, setIsMyPostsActive] = useState(false);
-    const [isFriendsActive, setIsFriendsActive] = useState(false);
-    const [isChatsActive, setIsChatsActive] = useState(false);
-
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }} edges={["top"]}>
+        <SafeAreaView
+            style={{ flex: 1, backgroundColor: "#ffffff", justifyContent: "space-between" }}
+            edges={["top"]}
+        >
             <Tabs
+                initialRouteName="home"
                 screenOptions={{
                     tabBarStyle: styles.footer,
                     tabBarShowLabel: false,
                 }}
-                initialRouteName="home"
             >
                 <Tabs.Screen
                     name="home"
-                    listeners={{
-                        tabPress: () => {
-                            setIsHomeActive(true);
-                            setIsMyPostsActive(false);
-                            setIsFriendsActive(false);
-                            setIsChatsActive(false);
-                        },
-                    }}
                     options={{
-                        tabBarIcon: () => (
-                            <Image
-                                style={styles.home}
-                                source={
-                                    isHomeActive
-                                        ? require("../../src/shared/ui/images/home.png")
-                                        : require("../../src/shared/ui/images/home-without-line.png")
-                                }
-                            />
-                        ),
+                        tabBarIcon: ({ focused }) =>
+                            focused ? (
+                                <View
+                                    style={{
+                                        marginTop: 3,
+                                        borderTopWidth: 2,
+                                        borderTopColor: "#543C52",
+                                    }}
+                                >
+                                    <HomeIcon />
+                                </View>
+                            ) : (
+                                <HomeIcon />
+                            ),
                         header: () => <Header actionType={1} />,
                     }}
                 />
                 <Tabs.Screen
                     name="my-publications"
-                    listeners={{
-                        tabPress: () => {
-                            setIsHomeActive(false);
-                            setIsMyPostsActive(true);
-                            setIsFriendsActive(false);
-                            setIsChatsActive(false);
-                        },
-                    }}
                     options={{
-                        tabBarIcon: () => (
-                            <Image
-                                style={styles.myposts}
-                                source={
-                                    isMyPostsActive
-                                        ? require("../../src/shared/ui/images/my-posts-with-line.png")
-                                        : require("../../src/shared/ui/images/my-posts.png")
-                                }
-                            />
-                        ),
+                        tabBarIcon: ({ focused }) =>
+                            focused ? (
+                                <View
+                                    style={{
+                                        marginTop: 3,
+                                        borderTopWidth: 2,
+                                        borderTopColor: "#543C52",
+                                    }}
+                                >
+                                    <MyPub />
+                                </View>
+                            ) : (
+                                <MyPub />
+                            ),
                         header: () => <Header actionType={1} />,
                     }}
                 />
                 <Tabs.Screen
                     name="friends"
-                    listeners={{
-                        tabPress: () => {
-                            setIsHomeActive(false);
-                            setIsMyPostsActive(false);
-                            setIsFriendsActive(true);
-                            setIsChatsActive(false);
-                        },
-                    }}
                     options={{
-                        tabBarIcon: () => (
-                            <Image
-                                style={styles.friends}
-                                source={
-                                    isFriendsActive
-                                        ? require("../../src/shared/ui/images/friends-with-line.png")
-                                        : require("../../src/shared/ui/images/friends.png")
-                                }
-                            />
-                        ),
+                        tabBarIcon: ({ focused }) =>
+                            focused ? (
+                                <View
+                                    style={{
+                                        marginTop: 3,
+                                        borderTopWidth: 2,
+                                        borderTopColor: "#543C52",
+                                    }}
+                                >
+                                    <FriendsIcon />
+                                </View>
+                            ) : (
+                                <FriendsIcon />
+                            ),
                         header: () => <Header />,
                     }}
                 />
                 <Tabs.Screen
                     name="chats"
-                    listeners={{
-                        tabPress: () => {
-                            setIsHomeActive(false);
-                            setIsMyPostsActive(false);
-                            setIsFriendsActive(false);
-                            setIsChatsActive(true);
-                        },
-                    }}
                     options={{
-                        tabBarIcon: () => (
-                            <Image
-                                style={styles.chats}
-                                source={
-                                    isChatsActive
-                                        ? require("../../src/shared/ui/images/correctChats.png")
-                                        : require("../../src/shared/ui/images/correctChats.png")
-                                }
-                            />
-                        ),
+                        tabBarIcon: ({ focused }) =>
+                            focused ? (
+                                <View
+                                    style={{
+                                        marginTop: 3,
+                                        borderTopWidth: 2,
+                                        borderTopColor: "#543C52",
+                                    }}
+                                >
+                                    <ChatsMain />
+                                </View>
+                            ) : (
+                                <ChatsMain />
+                            ),
                         header: () => <Header actionType={3} />,
-                    }}
-                />
-                {}
-                <Tabs.Screen
-                    name="settings"
-                    listeners={{
-                        tabPress: () => {
-                            setIsHomeActive(false);
-                            setIsMyPostsActive(false);
-                            setIsFriendsActive(false);
-                            setIsChatsActive(false);
-                        },
-                    }}
-                    options={{
-                        header: () => <Header actionType={2} />,
-                        href: null,
                     }}
                 />
             </Tabs>

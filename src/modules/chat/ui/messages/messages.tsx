@@ -7,6 +7,7 @@ import { IUser } from "../../../auth/types";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useChats } from "../../hooks/useChats";
 import { useRouter } from "expo-router";
+import { ChatsIcon } from "../../../../shared/ui/icons/chats";
 
 export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) {
     const { user } = useUserContext();
@@ -51,7 +52,7 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
     const content = (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Image source={require("../../../../shared/ui/images/chat.png")} />
+                <ChatsIcon style={{ width: 25, height: 25 }} />
                 <Text style={styles.title}>Повідомлення</Text>
             </View>
 

@@ -11,19 +11,19 @@ export function MyPublications() {
     const [userPosts, setUserPosts] = useState<IPost[]>([]);
 
     useEffect(() => {
-        if (!user) return;
-        const myPosts = posts.filter(post => post.author_id === user.id);
-        setUserPosts(myPosts);
-    }, [posts, user]);
-
-    useEffect(() => {
         const interval = setInterval(() => {
             refresh();
             refreshUser();
         }, 3000); // кожні 3 секунди
 
         return () => clearInterval(interval);
-    }, []);
+    }, [user]);
+
+    useEffect(() => {
+        if (!user) return;
+        const myPosts = posts.filter(post => post.author_id === user.id);
+        setUserPosts(myPosts);
+    }, [posts, user]);
 
     return (
         <FlatList

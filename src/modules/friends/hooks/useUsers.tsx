@@ -11,7 +11,7 @@ export function useUsers() {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await fetch(`${API_BASE_URL}/user/all`);
+            const response = await fetch(`${API_BASE_URL}/users/all`);
             const result = await response.json();
             if (result.status === "error") {
                 return;

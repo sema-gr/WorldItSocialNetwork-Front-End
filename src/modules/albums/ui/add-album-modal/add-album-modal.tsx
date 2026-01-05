@@ -70,6 +70,9 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                     topic: [theme],
                 },
             });
+            if (response.status === "error") {
+                Alert.alert("Error", "Album creation failed: " + response.message);
+            }
             Alert.alert("Успіх", "Альбом успішно створено!");
             onClose();
             resetForm();
@@ -133,32 +136,6 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                                     }}
                                 />
                             </View>
-
-                            {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}>
-                <DropDownPicker
-                  open={openYear}
-                  value={year}
-                  items={yearItems}
-                  setOpen={setOpenYear}
-                  setValue={setYear}
-                  setItems={setYearItems}
-                  placeholder="Оберіть рік"
-                  searchable={true}
-                  searchPlaceholder="Пошук року..."
-                  listMode="MODAL"
-                  scrollViewProps={{
-                    nestedScrollEnabled: true,
-                  }}
-                  addCustomItem={true}
-                  maxHeight={200}
-                  zIndex={1000}
-                  dropDownContainerStyle={{
-                    maxHeight: 250,
-                    borderColor: "#543C52",
-                    zIndex: 1000,
-                  }}
-                />
-              </View> */}
                         </View>
 
                         <View style={styles.actions}>

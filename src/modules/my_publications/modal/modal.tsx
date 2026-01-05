@@ -643,9 +643,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     textArea: {
-        width: "100%",
         minHeight: 120,
         minWidth: "90%",
+        maxWidth: "90%",
+        width: "100%",
         padding: 16,
         borderWidth: 1,
         borderColor: "#CDCED2",

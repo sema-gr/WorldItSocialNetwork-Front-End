@@ -48,14 +48,6 @@ export function ModalPost({
         getToken().then(setTokenUser);
     }, []);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            refresh();
-        }, 3000); // кожні 3 секунди
-
-        return () => clearInterval(interval);
-    }, []);
-
     const modalWidth = 343;
     const modalHeight = 140;
     const { height: screenHeight } = Dimensions.get("window");

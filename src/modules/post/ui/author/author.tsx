@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect, ElementRef } from "react";
-import { View, Image, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
+import React, { useState, useRef, useEffect, ElementRef, use } from "react";
+import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
+import { Image } from "expo-image";
 import Dots from "../../../../shared/ui/icons/dots";
 import { styles } from "./author.styles";
 import { IPost } from "../../types/post";
@@ -13,12 +14,16 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
     const containerRef = useRef<View>(null);
     const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
-    const { user } = useUserByID(props.author_id);
-    const { user: currentUser, refreshUser } = useUserContext();
+    const { user, refresh } = useUserByID(props.author_id);
+    const { user: currentUser } = useUserContext();
     const [containerSize, setContainerSize] = useState({
         width: 400,
         height: 725,
     });
+
+    useEffect(() => {
+        refresh();
+    }, [user]);
 
     const measureDots = () => {
         if (dotsRef.current) {
@@ -27,10 +32,6 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
             });
         }
     };
-
-    useEffect(() => {
-        refreshUser();
-    }, [currentUser]);
 
     useEffect(() => {
         if (modalVisible) {
@@ -55,6 +56,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
                 <View style={styles.contant}>
                     <View style={{ position: "relative" }}>
                         <Image
+                            key={user?.image}
                             style={{ width: 50, height: 50, borderRadius: 200 }}
                             source={{ uri: `${API_BASE_URL}/${user?.image}` }}
                         />

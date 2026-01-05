@@ -21,7 +21,7 @@ const screenWidth = Dimensions.get("window").width;
 export function AlbumHeader() {
     const [activeTab, setActiveTab] = useState<"personal" | "albums">("personal");
     const translateX = useRef(new Animated.Value(0)).current;
-    const { user, refreshUser } = useUserContext();
+    const { user } = useUserContext();
     const { albums, refetch, error } = useAlbums();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +30,6 @@ export function AlbumHeader() {
 
         const interval = setInterval(() => {
             refetch();
-            refreshUser();
         }, 3000);
 
         return () => clearInterval(interval);
