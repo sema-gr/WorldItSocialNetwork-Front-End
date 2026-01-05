@@ -1,3 +1,12 @@
+## [1.0.1](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.0.0...v1.0.1) (2026-01-04)
+
+
+### Bug Fixes
+
+* change problems with photo ([acf5f77](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/acf5f777e46dff6bb5288c274ad95345e181f4d4))
+* log API_BASE_URL for debugging purposes ([2e86661](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/2e866611bde3e62e69b4045eee9e165d36dbdaa3))
+* log API_BASE_URL for debugging purposes ([ec897f2](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/ec897f22b478cd9d144522c10de5238dd9458862))
+
 # 1.0.0 (2025-12-05)
 
 ### Bug Fixes
