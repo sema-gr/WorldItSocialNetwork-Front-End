@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ElementRef, use } from "react";
+import React, { useState, useRef, useEffect, ElementRef } from "react";
 import { View, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import { Image } from "expo-image";
 import Dots from "../../../../shared/ui/icons/dots";

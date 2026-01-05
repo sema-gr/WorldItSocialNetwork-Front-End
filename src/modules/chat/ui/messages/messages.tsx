@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, ScrollView, TouchableOpacity } from "react-native";
 import { useUsers } from "../../../friends/hooks/useUsers";
 import { styles } from "./messages.styles";
 import { Friend2 } from "../friend2/friend";

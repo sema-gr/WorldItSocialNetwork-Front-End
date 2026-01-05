@@ -1,9 +1,8 @@
 import { Tabs } from "expo-router";
-import { Image, View } from "react-native";
+import { View } from "react-native";
 import { Header } from "../../src/shared/ui/header";
 import { styles } from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Home from "../../src/shared/ui/icons/footer-home-button";
 import HomeIcon from "../../src/shared/ui/icons/home";
 import MyPub from "../../src/shared/ui/icons/my-pub";
 import FriendsIcon from "../../src/shared/ui/icons/friends";
