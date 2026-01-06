@@ -49,7 +49,7 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                                     params: {
                                         chat_id: item.id,
                                         name: item.name,
-                                        avatar: "uploads/user.png",
+                                        avatar: require("../../../../shared/ui/images/avatar.png"),
                                         lastAtMessage: lastMessage?.sent_at.toString(),
                                     },
                                 });
@@ -58,7 +58,9 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                             <Friend2
                                 user={{
                                     name: item.name,
-                                    image: item.avatar || "uploads/user.png",
+                                    image:
+                                        item.avatar ||
+                                        require("../../../../shared/ui/images/user.png"),
                                 }}
                                 lastMessage={lastMessage?.content}
                             />

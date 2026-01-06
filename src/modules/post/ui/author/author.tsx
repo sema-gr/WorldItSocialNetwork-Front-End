@@ -15,7 +15,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     const containerRef = useRef<View>(null);
     const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
     const { user, refresh } = useUserByID(props.author_id);
-    const { user: currentUser } = useUserContext();
+    const { user: currentUser, refreshUser } = useUserContext();
     const [containerSize, setContainerSize] = useState({
         width: 400,
         height: 725,
@@ -23,6 +23,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
 
     useEffect(() => {
         refresh();
+        refreshUser();
     }, [user]);
 
     const measureDots = () => {

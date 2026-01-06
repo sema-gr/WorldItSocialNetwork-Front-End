@@ -103,7 +103,7 @@ export function Group() {
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", justifyContent: "center" }}>
                         <Image
-                            source={{ uri: API_BASE_URL + "/" + params.avatar }}
+                            source={require("../../../../shared/ui/images/user.png")}
                             style={styles.avatar}
                         />
                         <View style={{}}>

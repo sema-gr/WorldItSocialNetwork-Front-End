@@ -43,7 +43,7 @@ export function RecomendFriends({
     useEffect(() => {
         const interval = setInterval(() => {
             refresh();
-        }, 3000);
+        }, 1000);
 
         return () => clearInterval(interval);
     }, []);

@@ -60,8 +60,10 @@ export function FriendProfile({ user }: FriendProfileProps) {
                 chat.members.length === 2
             );
         });
+        console.log("existingChat:", existingChat);
         if (existingChat) {
-            return router.replace({
+            console.log("Navigating to existing chat:", existingChat.id);
+            return router.navigate({
                 pathname: "/chat",
                 params: {
                     chat_id: existingChat.id,

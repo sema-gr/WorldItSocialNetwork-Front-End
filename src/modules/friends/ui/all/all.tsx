@@ -16,7 +16,7 @@ export function AllFriends({
     onShowAll?: () => void;
 }) {
     const { users, refresh } = useUsers();
-    const { user } = useUserContext();
+    const { user, refreshUser } = useUserContext();
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>([]);
 
     function updateFriendList() {
@@ -41,7 +41,8 @@ export function AllFriends({
     useEffect(() => {
         const interval = setInterval(() => {
             refresh();
-        }, 3000);
+            refreshUser();
+        }, 1000);
 
         return () => clearInterval(interval);
     }, []);

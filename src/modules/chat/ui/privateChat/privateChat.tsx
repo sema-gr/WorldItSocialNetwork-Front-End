@@ -224,7 +224,7 @@ export function PrivatChat() {
                         />
                         <View style={{}}>
                             <Text style={styles.chatName}>{params.name}</Text>
-                            <Text style={styles.chatInfo}>@{params.username.toLowerCase()}</Text>
+                            <Text style={styles.chatInfo}>@{params.username}</Text>
                         </View>
                     </View>
                 </View>

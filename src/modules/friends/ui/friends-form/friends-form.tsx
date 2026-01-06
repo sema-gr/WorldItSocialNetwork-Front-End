@@ -73,7 +73,8 @@ export function FriendsForm(props: FriendsFormProps) {
             }
 
             Alert.alert("Успіх", "Запит відхилено");
-        } catch (error: string) {
+        } catch (error) {
+            if (!(error instanceof Error)) return;
             Alert.alert("Помилка", "Не вдалося підтвердити запит");
             console.log(error.message);
         }

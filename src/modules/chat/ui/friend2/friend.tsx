@@ -16,9 +16,7 @@ export function Friend2(props: IFriendProps) {
     return (
         <View style={styles.container}>
             <Image
-                source={{
-                    uri: API_BASE_URL + "/" + props.user?.image,
-                }}
+                source={require("../../../../shared/ui/images/user.png")}
                 style={styles.avatar}
             />
             <View style={styles.textBox}>

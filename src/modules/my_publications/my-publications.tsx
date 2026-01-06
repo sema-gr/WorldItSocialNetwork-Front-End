@@ -14,7 +14,7 @@ export function MyPublications() {
         const interval = setInterval(() => {
             refresh();
             refreshUser();
-        }, 3000); // кожні 3 секунди
+        }, 1000); // кожну 1 секунду
 
         return () => clearInterval(interval);
     }, [user]);

@@ -30,7 +30,7 @@ export function AlbumHeader() {
 
         const interval = setInterval(() => {
             refetch();
-        }, 3000);
+        }, 1000);
 
         return () => clearInterval(interval);
     }, [user]);

@@ -9,10 +9,10 @@ export function Homepage() {
     useEffect(() => {
         const interval = setInterval(() => {
             refresh();
-        }, 3000); // кожні 3 секунди
+        }, 1000); // кожну 1 секунди
 
         return () => clearInterval(interval);
-    }, []);
+    }, [posts]);
 
     return (
         <ScrollView
