@@ -1,4 +1,4 @@
-import { ScrollView, View, Image, Text, FlatList, TouchableOpacity } from "react-native";
+import { ScrollView, View, Image, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { useUserContext } from "../../../auth/context/user-context";
 import OfflineIcon from "../../../../shared/ui/icons/offline-circle";
 import { Button } from "../../../../shared/ui/button";
@@ -17,6 +17,9 @@ import { useRouter } from "expo-router";
 import { useFriends } from "../../hooks/useFriends";
 import { IFriendship } from "../../types/friends.type";
 import { useChats } from "../../../chat/hooks/useChats";
+import { POST } from "../../../../shared/api/post";
+import { Chat } from "../../../chat/types/socket";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface FriendProfileProps {
     user: IUser;
@@ -26,7 +29,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
     const { albums } = useAlbums();
     const { posts } = usePosts();
     const { friends } = useFriends();
-    const { chats } = useChats();
+    const { chats, refetchChats } = useChats();
     const { user: currentUser } = useUserContext();
     const router = useRouter();
     const [myAlbums, setMyAlbums] = useState<IAlbum[]>([]);
@@ -50,31 +53,54 @@ export function FriendProfile({ user }: FriendProfileProps) {
         router.back();
     }
 
-    function onWrite() {
-        const existingChat = chats.find(chat => {
-            if (!currentUser || !user) return false;
-            const memberIds = chat.members.map(m => m.profile_id);
-            return (
-                memberIds.includes(currentUser.id) &&
-                memberIds.includes(user.id) &&
-                chat.members.length === 2
-            );
-        });
-        console.log("existingChat:", existingChat);
-        if (existingChat) {
-            console.log("Navigating to existing chat:", existingChat.id);
+    async function onWrite() {
+        try {
+            if (!currentUser || !user) return;
+
+            const token = await AsyncStorage.getItem("token");
+            if (!token) {
+                Alert.alert("Помилка", "Користувач не авторизований");
+                return;
+            }
+
+            const response = await POST<Chat>({
+                endpoint: `${API_BASE_URL}/chats/create`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: {
+                    name: user.name,
+                    is_personal_chat: true,
+                    admin_id: currentUser.id,
+                    members: [{ id: currentUser.id }, { id: user.id }],
+                    avatar: user.image,
+                },
+            });
+
+            if (response.status === "error") {
+                Alert.alert("Помилка", response.message || "Не вдалося створити чат");
+                return;
+            }
+
+            const chat = response.data;
+
+            refetchChats();
+
             return router.navigate({
                 pathname: "/chat",
                 params: {
-                    chat_id: existingChat.id,
+                    chat_id: chat.id,
                     name: user.name,
                     avatar: user.image,
                     username: user.username,
                     lastAtMessage:
-                        user.chat_messages?.at(-1)?.chat_messages.at(-1)?.sent_at.toString() ||
-                        new Date().toISOString(),
+                        chat.chat_messages?.at(-1)?.sent_at?.toString() ?? new Date().toISOString(),
                 },
             });
+        } catch (err) {
+            console.log("Error creating chat:", err);
+            Alert.alert("Помилка", "Сталася помилка при створенні чату");
         }
     }
 
@@ -126,10 +152,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
                                 onPress={onWrite}
                                 label="Написати"
                                 style={[styles.confirmButton]}
-                            ></Button>
-                            {/* <TouchableOpacity style={styles.deleteButton}>
-							<Text style={styles.buttonText}>Видалити</Text>
-						</TouchableOpacity> */}
+                            />
                         </View>
                     ) : null}
                 </View>

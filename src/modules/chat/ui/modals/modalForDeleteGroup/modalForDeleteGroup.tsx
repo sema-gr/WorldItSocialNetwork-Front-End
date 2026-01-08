@@ -13,29 +13,33 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE } from "../../../../../shared/api/delete";
 import { API_BASE_URL } from "../../../../../settings";
-import { styles } from "./chatModalDelete.style";
+import { styles } from "./modalForDeleteGroup.style";
 import Dots from "../../../../../shared/ui/icons/dots";
 import { router } from "expo-router";
+import { useUserContext } from "../../../../auth/context/user-context";
 
 interface ModalChatProps {
     visible: boolean;
     onClose: () => void;
     chat_id: number;
+    id_admin: number;
     dotsPosition: { x: number; y: number };
     scrollOffset?: number;
     onMessagesDeleted: () => void;
 }
 
-export function ChatModalDelete({
+export function ModalForDeleteGroup({
     visible,
     onClose,
     chat_id,
     dotsPosition,
+    id_admin,
     scrollOffset = 0,
     onMessagesDeleted,
 }: ModalChatProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const [tokenUser, setTokenUser] = useState<string | null>(null);
+    const { user } = useUserContext();
     const { refetchChats } = useChats();
 
     const getToken = async (): Promise<string | null> => {
@@ -69,35 +73,6 @@ export function ChatModalDelete({
 
         setIsDeleting(true);
         try {
-            await DELETE({
-                endpoint: `${API_BASE_URL}/messages/${chatId}`,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${tokenUser}`,
-                },
-            });
-
-            onMessagesDeleted();
-            onClose();
-            Alert.alert("Успіх", "Всі повідомлення успішно видалено");
-            refetchChats();
-            router.back();
-        } catch (error) {
-            console.log("Помилка видалення:", error);
-            Alert.alert("Помилка", "Не вдалося видалити повідомлення");
-        } finally {
-            setIsDeleting(false);
-        }
-    }
-
-    async function handleDeleteChat(chatId: number) {
-        if (!tokenUser) {
-            Alert.alert("Помилка", "Не вдалося отримати токен користувача");
-            return;
-        }
-
-        setIsDeleting(true);
-        try {
             const result = await DELETE({
                 endpoint: `${API_BASE_URL}/chats/${chatId}`,
                 headers: {
@@ -106,16 +81,17 @@ export function ChatModalDelete({
                 },
             });
             if (result.status == "error") {
-                Alert.alert("Помилка", result.message || "Не вдалося видалити чат");
+                Alert.alert("Помилка", "Не вдалося видалити групу");
             }
+
+            refetchChats();
             onMessagesDeleted();
             onClose();
-            Alert.alert("Успіх", "Чат видалено");
-            refetchChats();
-            router.back();
+            Alert.alert("Успіх", "Група видалена успішно");
+            router.replace("/chats");
         } catch (error) {
             console.log("Помилка видалення:", error);
-            Alert.alert("Помилка", "Не вдалося видалити чат");
+            Alert.alert("Помилка", "Не вдалося видалити повідомлення");
         } finally {
             setIsDeleting(false);
         }
@@ -139,6 +115,27 @@ export function ChatModalDelete({
                         <Dots style={styles.dotsIcon} />
                     </View>
                     <View style={styles.divider} />
+                    {user?.id === id_admin ? (
+                        <TouchableOpacity
+                            style={styles.modalOption}
+                            onPress={() => handleDelete(chat_id)}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
+                                <ActivityIndicator color="red" />
+                            ) : (
+                                <>
+                                    <Image
+                                        source={require("../../../../../shared/ui/images/trash.png")}
+                                        style={styles.icon}
+                                    />
+                                    <Text style={[styles.optionText, styles.deleteText]}>
+                                        Видалити групу
+                                    </Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                    ) : null}
 
                     <TouchableOpacity
                         style={styles.modalOption}
@@ -166,38 +163,6 @@ export function ChatModalDelete({
                                     />
                                     <Text style={[styles.optionText, styles.deleteText]}>
                                         Видалити всі повідомлення
-                                    </Text>
-                                </View>
-                            </View>
-                        )}
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.modalOption}
-                        onPress={() => handleDeleteChat(chat_id)}
-                        disabled={isDeleting}
-                    >
-                        {isDeleting ? (
-                            <ActivityIndicator color="red" />
-                        ) : (
-                            <View
-                                style={{
-                                    flexDirection: "column",
-                                    alignItems: "flex-start",
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <Image
-                                        source={require("../../../../../shared/ui/images/trash.png")}
-                                        style={styles.icon}
-                                    />
-                                    <Text style={[styles.optionText, styles.deleteText]}>
-                                        Видалити чат
                                     </Text>
                                 </View>
                             </View>

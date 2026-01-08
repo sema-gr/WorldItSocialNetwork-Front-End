@@ -124,12 +124,6 @@ export function PrivatChat() {
         });
     }
 
-    function onBack() {
-        router.navigate({
-            pathname: "/chats",
-        });
-    }
-
     function shouldShowDate(currentMessage: MessagePayload, prevMessage?: MessagePayload) {
         if (!prevMessage) return true;
         const currentDate = new Date(currentMessage.sent_at).toDateString();
@@ -182,8 +176,8 @@ export function PrivatChat() {
                     .filter(asset => asset.base64)
                     .map(asset => `data:image/jpeg;base64,${asset.base64!}`);
 
-                if (selectedImages.length + newImages.length > 5) {
-                    Alert.alert("Ліміт зображень", "Можна вибрати не більше 5 зображень.");
+                if (selectedImages.length + newImages.length > 1) {
+                    Alert.alert("Ліміт зображень", "Можна вибрати не більше 1 зображення.");
                     return;
                 }
 
@@ -207,7 +201,7 @@ export function PrivatChat() {
         <View style={styles.container}>
             <View style={styles.chatHeader}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
-                    <TouchableOpacity onPress={onBack}>
+                    <TouchableOpacity onPress={() => router.back()}>
                         <BackArrowIcon style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
                     <View

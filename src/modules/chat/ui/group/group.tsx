@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import {
     View,
     Text,
@@ -6,8 +6,8 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
-    KeyboardAvoidingView,
     Platform,
+    Alert,
 } from "react-native";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
@@ -19,6 +19,9 @@ import { API_BASE_URL } from "../../../../settings";
 import { useSocketContext } from "../../context/socketContext";
 import { CreateMessage, MessagePayload } from "../../types/socket";
 import { useUserContext } from "../../../auth/context/user-context";
+import { ModalForDeleteGroup } from "../modals/modalForDeleteGroup/modalForDeleteGroup";
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export function Group() {
     const params = useLocalSearchParams<{
@@ -26,6 +29,9 @@ export function Group() {
         chat_id: string;
         avatar: string;
         username: string;
+        id_admin: string;
+        members: string;
+        lastAtMessage: string;
     }>();
     const { user } = useUserContext();
     const { socket } = useSocketContext();
@@ -35,11 +41,36 @@ export function Group() {
     const scrollViewRef = useRef<ScrollView>(null);
     const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [dotsPosition, setDotsPosition] = useState({ x: 324, y: 20 });
+    const [scrollOffset, setScrollOffset] = useState(0);
+    const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+    const [members, setMembers] = useState<{ id: number; name: string; avatar: string }[]>([]);
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
     useEffect(() => {
         setIsMounted(true);
         return () => setIsMounted(false);
     }, []);
+
+    useEffect(() => {
+        if (params.members) {
+            try {
+                const parsedMembers = JSON.parse(params.members);
+                setMembers(parsedMembers);
+            } catch {
+                setMembers([]);
+            }
+        }
+    }, [params.members]);
+
+    const avatarsMap = useMemo(() => {
+        const map: { [key: number]: string } = {};
+        members.forEach(m => {
+            map[m.id] = API_BASE_URL + "/" + m.avatar;
+        });
+        return map;
+    }, [members]);
 
     useEffect(() => {
         if (!socket || !isMounted) return;
@@ -88,11 +119,72 @@ export function Group() {
         setInput("");
     };
 
+    const pickImage = async () => {
+        try {
+            const { status } = await requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert("Дозвіл не надано", "Потрібен доступ до галереї");
+                return;
+            }
+
+            const result = await launchImageLibraryAsync({
+                mediaTypes: "images",
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                base64: true,
+            });
+
+            if (!result.canceled && result.assets?.length > 0) {
+                const newImages = result.assets
+                    .filter(asset => asset.base64)
+                    .map(asset => `data:image/jpeg;base64,${asset.base64!}`);
+
+                if (selectedImages.length + newImages.length > 1) {
+                    Alert.alert("Ліміт зображень", "Можна вибрати не більше 1 зображення.");
+                    return;
+                }
+
+                setSelectedImages(prev => [...prev, ...newImages]);
+            }
+        } catch (error) {
+            console.log("Could not select image:", error);
+            Alert.alert("Error", "Could not select image");
+        }
+    };
+
+    function shouldShowDate(currentMessage: MessagePayload, prevMessage?: MessagePayload) {
+        if (!prevMessage) return true;
+        const currentDate = new Date(currentMessage.sent_at).toDateString();
+        const prevDate = new Date(prevMessage.sent_at).toDateString();
+        return currentDate !== prevDate;
+    }
+
+    function formatDate(date: Date) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        const isToday = date.toDateString() === today.toDateString();
+        const isYesterday = date.toDateString() === yesterday.toDateString();
+
+        if (isToday) return "Сьогодні";
+        if (isYesterday) return "Вчора";
+        return date.toLocaleDateString("uk-UA", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
+    }
+
     function onBack() {
         router.navigate({
             pathname: "/chats",
         });
     }
+
+    const showFullScreenImage = (uri: string) => {
+        setFullScreenImage(uri);
+    };
 
     return (
         <View style={styles.container}>
@@ -101,94 +193,199 @@ export function Group() {
                     <TouchableOpacity onPress={onBack}>
                         <BackArrowIcon style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
-                    <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 15,
+                        }}
+                    >
                         <Image
                             source={require("../../../../shared/ui/images/user.png")}
                             style={styles.avatar}
                         />
-                        <View style={{}}>
+                        <View>
                             <Text style={styles.chatName}>{params.name}</Text>
-                            <Text style={styles.chatInfo}></Text>
+                            <Text style={styles.chatInfo}>
+                                {members.map(m => m.name).join(", ")}
+                            </Text>
                         </View>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.menuBtn}>
+                <TouchableOpacity style={styles.menuBtn} onPress={() => setModalVisible(true)}>
                     <Dots style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.chatDate}>
-                {new Date().toLocaleDateString("uk-UA", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                })}
-            </Text>
-
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 20}
+            <KeyboardAwareScrollView
+                innerRef={ref => {
+                    scrollViewRef.current = ref;
+                }}
+                enableOnAndroid={true}
+                extraScrollHeight={Platform.OS === "ios" ? 80 : 0}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={styles.messages}
+                enableAutomaticScroll={false}
+                extraHeight={20}
             >
-                <ScrollView
-                    ref={scrollViewRef}
-                    overScrollMode="never"
-                    contentContainerStyle={styles.messages}
-                    keyboardShouldPersistTaps="handled"
-                >
-                    {messages?.map((msg, index) => {
-                        const isMyMessage = msg.author_id === user?.id;
-                        return (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.message,
-                                    isMyMessage ? { justifyContent: "flex-end" } : {},
-                                ]}
-                            >
-                                {!isMyMessage && (
-                                    <Image
-                                        source={{ uri: API_BASE_URL + "/" + params.avatar }}
-                                        style={{ width: 40, height: 40, borderRadius: 12345 }}
-                                    />
-                                )}
-                                <View
-                                    style={
-                                        isMyMessage ? styles.messageBubbleMy : styles.messageBubble
-                                    }
-                                >
-                                    <Text style={styles.messageText}>{msg.content}</Text>
-                                    <Text style={styles.messageTime}>
-                                        {new Date(msg.sent_at).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })}
-                                        <CheckMarkIcon style={{ width: 10, height: 9 }} />
-                                    </Text>
+                {messages.length === 0 ? (
+                    <Text style={{ textAlign: "center", paddingTop: 10, color: "#543C52" }}>
+                        Немає повідомлень!
+                    </Text>
+                ) : (
+                    <View>
+                        {messages?.map((msg, index) => {
+                            const isMyMessage = msg.author_id === user?.id;
+                            const showDate = shouldShowDate(msg, messages[index - 1]);
+                            return (
+                                <View key={index}>
+                                    {showDate && (
+                                        <View style={{ alignItems: "center", marginVertical: 10 }}>
+                                            <View style={styles.dateContainer}>
+                                                <Text style={styles.chatDate}>
+                                                    {formatDate(new Date(msg.sent_at))}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )}
+                                    <View
+                                        style={[
+                                            styles.message,
+                                            isMyMessage ? { justifyContent: "flex-end" } : {},
+                                        ]}
+                                    >
+                                        {!isMyMessage && (
+                                            <Image
+                                                source={{
+                                                    uri: avatarsMap[msg.author_id],
+                                                }}
+                                                style={{
+                                                    width: 40,
+                                                    height: 40,
+                                                    borderRadius: 12345,
+                                                }}
+                                            />
+                                        )}
+                                        <View
+                                            style={
+                                                isMyMessage
+                                                    ? styles.messageBubbleMy
+                                                    : styles.messageBubble
+                                            }
+                                        >
+                                            {msg.attached_image && (
+                                                <TouchableOpacity
+                                                    onPress={() =>
+                                                        showFullScreenImage(msg.attached_image)
+                                                    }
+                                                >
+                                                    <Image
+                                                        source={{ uri: msg.attached_image }}
+                                                        style={[
+                                                            styles.messageImage,
+                                                            {
+                                                                width: 150,
+                                                                height: 150,
+                                                                borderRadius: 8,
+                                                            },
+                                                        ]}
+                                                        resizeMode="cover"
+                                                    />
+                                                </TouchableOpacity>
+                                            )}
+                                            <Text style={styles.messageText}>{msg.content}</Text>
+                                            <View style={styles.messageBox}>
+                                                <Text style={styles.messageTime}>
+                                                    {new Date(msg.sent_at).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
+                                                </Text>
+                                                <CheckMarkIcon style={{ width: 10, height: 9 }} />
+                                            </View>
+                                        </View>
+                                    </View>
                                 </View>
-                            </View>
-                        );
-                    })}
-                </ScrollView>
+                            );
+                        })}
+                    </View>
+                )}
+            </KeyboardAwareScrollView>
 
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Повідомлення"
-                        value={input}
-                        onChangeText={setInput}
+            {selectedImages.length > 0 && (
+                <ScrollView
+                    horizontal
+                    style={styles.selectedImagesContainer}
+                    showsHorizontalScrollIndicator={false}
+                >
+                    {selectedImages.map((img, index) => (
+                        <View key={index} style={styles.previewImageWrapper}>
+                            <Image
+                                source={{ uri: img }}
+                                style={styles.selectedImage}
+                                resizeMode="cover"
+                            />
+                            <TouchableOpacity
+                                style={[
+                                    styles.removeImageButton,
+                                    {
+                                        position: "absolute",
+                                        top: -5,
+                                        right: -5,
+                                        backgroundColor: "#9c0a0aff",
+                                        borderRadius: 12,
+                                        width: 24,
+                                        height: 24,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    },
+                                ]}
+                                onPress={() =>
+                                    setSelectedImages(prev => prev.filter((_, i) => i !== index))
+                                }
+                            >
+                                <Text
+                                    style={[
+                                        styles.removeImageText,
+                                        { color: "#fff", fontSize: 16 },
+                                    ]}
+                                >
+                                    ×
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </ScrollView>
+            )}
+
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Повідомлення"
+                    value={input}
+                    onChangeText={setInput}
+                />
+                <TouchableOpacity style={styles.attachBtn} onPress={pickImage}>
+                    <Image
+                        source={require("../../../../shared/ui/images/pictures-modal.png")}
+                        style={{ width: 40, height: 40 }}
                     />
-                    <TouchableOpacity style={styles.attachBtn}>
-                        <Image
-                            source={require("../../../../shared/ui/images/pictures-modal.png")}
-                            style={{ width: 40, height: 40 }}
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-                        <SendArrow style={{ width: 20, height: 20 }} />
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+                    <SendArrow style={{ width: 20, height: 20 }} />
+                </TouchableOpacity>
+            </View>
+
+            <ModalForDeleteGroup
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                chat_id={parseInt(params.chat_id)}
+                id_admin={parseInt(params.id_admin)}
+                dotsPosition={dotsPosition}
+                scrollOffset={scrollOffset}
+                onMessagesDeleted={() => setMessages([])}
+            />
         </View>
     );
 }

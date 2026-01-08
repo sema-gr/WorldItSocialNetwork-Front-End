@@ -1,4 +1,5 @@
 import { Result } from "../../../shared/types/result";
+import { IUser } from "../../auth/types";
 
 export type Chat = {
     id: number;
@@ -13,6 +14,7 @@ export type Chat = {
 export interface ChatGroupMembers {
     chat_groupId: number;
     profile_id: number;
+    profile: IUser;
 }
 
 export type ChatWithMessagesAndParticipants = {

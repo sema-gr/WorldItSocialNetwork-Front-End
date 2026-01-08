@@ -49,7 +49,14 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                                     params: {
                                         chat_id: item.id,
                                         name: item.name,
-                                        avatar: require("../../../../shared/ui/images/avatar.png"),
+                                        id_admin: item.admin_id.toString(),
+                                        members: JSON.stringify(
+                                            item.members.map(m => ({
+                                                id: m.profile_id,
+                                                name: m.profile.name,
+                                                avatar: m.profile.image,
+                                            })),
+                                        ),
                                         lastAtMessage: lastMessage?.sent_at.toString(),
                                     },
                                 });

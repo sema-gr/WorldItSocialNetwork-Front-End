@@ -20,34 +20,28 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
         const interval = setInterval(() => {
             refetchChats();
             refresh();
-        }, 200);
+        }, 1000);
 
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         if (!user || !chats || !users) return;
-        // console.log(JSON.stringify(user, null, 2));
+
         const membersIds: number[] = [];
+
         chats.forEach(chat => {
-            if (chat.is_personal_chat) {
-                chat.members.forEach(member => {
-                    if (member.profile_id !== user.id) {
-                        user.chat_group_members?.forEach(chatGroup => {
-                            if (chatGroup.chat_groupId === chat.id) {
-                                membersIds.push(member.profile_id);
-                            }
-                        });
-                    }
-                });
+            if (!chat.is_personal_chat) return;
+
+            const otherMember = chat.members.find(m => m.profile_id !== user.id);
+
+            if (otherMember) {
+                membersIds.push(otherMember.profile_id);
             }
         });
-        const filteredUsers = users.filter(user => {
-            return membersIds.includes(user.id);
-        });
 
-        setChatMembers(filteredUsers);
-    }, [chats, user, users]);
+        setChatMembers(users.filter(u => membersIds.includes(u.id)));
+    }, [chats, users, user]);
 
     const content = (
         <View style={styles.container}>
@@ -88,7 +82,9 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                             <Friend2
                                 user={{
                                     name: item.name ?? "User",
-                                    image: item.image ?? "uploads/user.png",
+                                    image:
+                                        item.image ||
+                                        require("../../../../shared/ui/images/user.png"),
                                     surname: item.surname ?? "User",
                                 }}
                                 lastMessage={lastMessage?.content.toString()}
