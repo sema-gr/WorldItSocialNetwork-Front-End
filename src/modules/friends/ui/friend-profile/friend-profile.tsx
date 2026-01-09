@@ -114,10 +114,17 @@ export function FriendProfile({ user }: FriendProfileProps) {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.profileImageContainer}>
-                        <Image
-                            style={styles.profileImage}
-                            source={{ uri: API_BASE_URL + "/" + user.image }}
-                        />
+                        {user?.image === undefined ? (
+                            <Image
+                                style={styles.profileImage}
+                                source={require("../../../../shared/ui/images/avatar.png")}
+                            />
+                        ) : (
+                            <Image
+                                style={styles.profileImage}
+                                source={{ uri: API_BASE_URL + "/" + user.image }}
+                            />
+                        )}
                         <OfflineIcon style={styles.imageOnline} />
                     </View>
                     <View style={styles.userInfo}>

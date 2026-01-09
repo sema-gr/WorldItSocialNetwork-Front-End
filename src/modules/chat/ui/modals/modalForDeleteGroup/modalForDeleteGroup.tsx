@@ -65,7 +65,36 @@ export function ModalForDeleteGroup({
     const adjustedY = dotsPosition?.y ? dotsPosition.y - scrollOffset + 3 : 0;
     const clampedY = Math.min(Math.max(adjustedY, 10), screenHeight - modalHeight - 10);
 
-    async function handleDelete(chatId: number) {
+    async function handleDeleteMessages(chatId: number) {
+        if (!tokenUser) {
+            Alert.alert("Помилка", "Не вдалося отримати токен користувача");
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            await DELETE({
+                endpoint: `${API_BASE_URL}/messages/${chatId}`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${tokenUser}`,
+                },
+            });
+
+            onMessagesDeleted();
+            onClose();
+            Alert.alert("Успіх", "Всі повідомлення успішно видалено");
+            refetchChats();
+            router.back();
+        } catch (error) {
+            console.log("Помилка видалення:", error);
+            Alert.alert("Помилка", "Не вдалося видалити повідомлення");
+        } finally {
+            setIsDeleting(false);
+        }
+    }
+
+    async function handleDeleteChat(chatId: number) {
         if (!tokenUser) {
             Alert.alert("Помилка", "Не вдалося отримати токен користувача");
             return;
@@ -81,17 +110,16 @@ export function ModalForDeleteGroup({
                 },
             });
             if (result.status == "error") {
-                Alert.alert("Помилка", "Не вдалося видалити групу");
+                Alert.alert("Помилка", result.message || "Не вдалося видалити чат");
             }
-
-            refetchChats();
             onMessagesDeleted();
             onClose();
-            Alert.alert("Успіх", "Група видалена успішно");
-            router.replace("/chats");
+            Alert.alert("Успіх", "Чат видалено");
+            refetchChats();
+            router.back();
         } catch (error) {
             console.log("Помилка видалення:", error);
-            Alert.alert("Помилка", "Не вдалося видалити повідомлення");
+            Alert.alert("Помилка", "Не вдалося видалити чат");
         } finally {
             setIsDeleting(false);
         }
@@ -118,7 +146,7 @@ export function ModalForDeleteGroup({
                     {user?.id === id_admin ? (
                         <TouchableOpacity
                             style={styles.modalOption}
-                            onPress={() => handleDelete(chat_id)}
+                            onPress={() => handleDeleteChat(chat_id)}
                             disabled={isDeleting}
                         >
                             {isDeleting ? (
@@ -139,7 +167,7 @@ export function ModalForDeleteGroup({
 
                     <TouchableOpacity
                         style={styles.modalOption}
-                        onPress={() => handleDelete(chat_id)}
+                        onPress={() => handleDeleteMessages(chat_id)}
                         disabled={isDeleting}
                     >
                         {isDeleting ? (

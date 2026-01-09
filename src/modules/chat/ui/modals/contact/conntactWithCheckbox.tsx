@@ -12,12 +12,19 @@ interface Contact {
 export function ContactWithCheckbox({ userContact, onPress }: Contact) {
     return (
         <TouchableOpacity style={styles.container} onPress={onPress}>
-            <Image
-                source={{
-                    uri: `${API_BASE_URL}/${userContact.image}`,
-                }}
-                style={styles.avatar}
-            />
+            {userContact.image === null ? (
+                <Image
+                    source={require("../../../../../shared/ui/images/avatar.png")}
+                    style={styles.avatar}
+                />
+            ) : (
+                <Image
+                    source={{
+                        uri: `${API_BASE_URL}/${userContact.image}`,
+                    }}
+                    style={styles.avatar}
+                />
+            )}
             <Text style={styles.name}>{userContact.name || "Anonymous"}</Text>
             {/* <Checkbox
           style={styles.checkbox}

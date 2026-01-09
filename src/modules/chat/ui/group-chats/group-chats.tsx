@@ -10,9 +10,17 @@ import { ChatGroupIcon } from "../../../../shared/ui/icons/groupChats";
 
 export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
     const { user } = useUserContext();
-    const { chats } = useChats();
+    const { chats, refetchChats } = useChats();
     const [groupChats, setGroupChats] = useState<Chat[]>([]);
     const router = useRouter();
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refetchChats();
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         if (!user || !chats) return;
@@ -65,11 +73,16 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                             <Friend2
                                 user={{
                                     name: item.name,
-                                    image:
-                                        item.avatar ||
-                                        require("../../../../shared/ui/images/user.png"),
                                 }}
-                                lastMessage={lastMessage?.content}
+                                lastMessage={
+                                    lastMessage?.content.toString()
+                                        ? lastMessage?.content.toString()
+                                        : lastMessage?.attached_image
+                                          ? "Фото"
+                                          : "Немає повідомлень"
+                                }
+                                timeMessage={lastMessage?.sent_at.toString()}
+                                groupChat={true}
                             />
                         </TouchableOpacity>
                     );

@@ -26,22 +26,21 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
     }, []);
 
     useEffect(() => {
-        if (!user || !chats || !users) return;
+        if (!user || !chats) return;
 
-        const membersIds: number[] = [];
+        // Фільтруємо чати, щоб лишились тільки ті, де є користувач
+        const filteredChats = chats.filter(chat =>
+            chat.members.some(m => m.profile_id === user.id),
+        );
 
-        chats.forEach(chat => {
-            if (!chat.is_personal_chat) return;
+        const personalChats = filteredChats.filter(c => c.is_personal_chat);
 
-            const otherMember = chat.members.find(m => m.profile_id !== user.id);
+        const companions = personalChats
+            .map(chat => chat.members.find(m => m.profile_id !== user.id)?.profile)
+            .filter(Boolean);
 
-            if (otherMember) {
-                membersIds.push(otherMember.profile_id);
-            }
-        });
-
-        setChatMembers(users.filter(u => membersIds.includes(u.id)));
-    }, [chats, users, user]);
+        setChatMembers(companions as IUser[]);
+    }, [chats, user]);
 
     const content = (
         <View style={styles.container}>
@@ -57,7 +56,10 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                 contentContainerStyle={{ gap: 10, flexGrow: 1 }}
                 renderItem={({ item }) => {
                     const chat = chats.find(
-                        c => c.is_personal_chat && c.members.some(m => m.profile_id === item.id),
+                        c =>
+                            c.is_personal_chat &&
+                            c.members.some(m => m.profile_id === user?.id) &&
+                            c.members.some(m => m.profile_id === item.id),
                     );
 
                     const lastMessage = chat?.chat_messages?.at(-1);
@@ -66,14 +68,18 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                         <TouchableOpacity
                             onPress={() => {
                                 if (chat) {
+                                    const companion = chat.members.find(
+                                        m => m.profile_id !== user?.id,
+                                    )?.profile;
+
                                     router.push({
                                         pathname: "/chat",
                                         params: {
                                             chat_id: chat.id,
-                                            name: item.name,
-                                            avatar: item.image,
-                                            username: item.username,
-                                            lastAtMessage: lastMessage?.sent_at.toString(),
+                                            companion_id: companion?.id,
+                                            companion_name: companion?.name,
+                                            companion_avatar: companion?.image,
+                                            companion_username: companion?.username,
                                         },
                                     });
                                 }
@@ -82,12 +88,16 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                             <Friend2
                                 user={{
                                     name: item.name ?? "User",
-                                    image:
-                                        item.image ||
-                                        require("../../../../shared/ui/images/user.png"),
+                                    image: item.image,
                                     surname: item.surname ?? "User",
                                 }}
-                                lastMessage={lastMessage?.content.toString()}
+                                lastMessage={
+                                    lastMessage?.content.toString()
+                                        ? lastMessage?.content.toString()
+                                        : lastMessage?.attached_image
+                                          ? "Фото"
+                                          : "Немає повідомлень"
+                                }
                                 timeMessage={lastMessage?.sent_at.toString()}
                             />
                         </TouchableOpacity>

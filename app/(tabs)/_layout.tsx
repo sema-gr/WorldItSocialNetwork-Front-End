@@ -38,7 +38,7 @@ export default function TabsLayout() {
                             ) : (
                                 <HomeIcon />
                             ),
-                        header: () => <Header actionType={1} />,
+                        header: () => <Header actionType={1} settings={true} />,
                     }}
                 />
                 <Tabs.Screen
@@ -58,7 +58,7 @@ export default function TabsLayout() {
                             ) : (
                                 <MyPub />
                             ),
-                        header: () => <Header actionType={1} />,
+                        header: () => <Header actionType={1} settings={true} />,
                     }}
                 />
                 <Tabs.Screen
@@ -78,7 +78,7 @@ export default function TabsLayout() {
                             ) : (
                                 <FriendsIcon />
                             ),
-                        header: () => <Header />,
+                        header: () => <Header settings={true} />,
                     }}
                 />
                 <Tabs.Screen
@@ -98,7 +98,7 @@ export default function TabsLayout() {
                             ) : (
                                 <ChatsMain />
                             ),
-                        header: () => <Header actionType={3} />,
+                        header: () => <Header actionType={3} settings={true} />,
                     }}
                 />
             </Tabs>

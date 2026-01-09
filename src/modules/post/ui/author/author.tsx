@@ -56,11 +56,19 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
             <View style={styles.main}>
                 <View style={styles.contant}>
                     <View style={{ position: "relative" }}>
-                        <Image
-                            key={user?.image}
-                            style={{ width: 50, height: 50, borderRadius: 200 }}
-                            source={{ uri: `${API_BASE_URL}/${user?.image}` }}
-                        />
+                        {user?.image === null ? (
+                            <Image
+                                key={user?.image}
+                                style={{ width: 50, height: 50, borderRadius: 200 }}
+                                source={require("../../../../shared/ui/images/avatar.png")}
+                            />
+                        ) : (
+                            <Image
+                                key={user?.image}
+                                style={{ width: 50, height: 50, borderRadius: 200 }}
+                                source={{ uri: `${API_BASE_URL}/${user?.image}` }}
+                            />
+                        )}
                         <Image
                             style={{
                                 width: 20,

@@ -27,12 +27,18 @@ import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "ex
 
 export function PrivatChat() {
     const params = useLocalSearchParams<{
-        name: string;
         chat_id: string;
-        avatar: string;
-        username: string;
-        lastAtMessage: string;
+        companion_id: string;
+        companion_name: string;
+        companion_avatar?: string;
+        companion_username: string;
     }>();
+    const companion = {
+        id: Number(params.companion_id),
+        name: params.companion_name,
+        avatar: params.companion_avatar,
+        username: params.companion_username,
+    };
     const { user } = useUserContext();
     const { socket } = useSocketContext();
     const [dotsPosition, setDotsPosition] = useState({ x: 50, y: 78 });
@@ -189,13 +195,15 @@ export function PrivatChat() {
         }
     };
 
-    const removeImage = (index: number) => {
-        setSelectedImages(prev => prev.filter((_, i) => i !== index));
-    };
-
     const showFullScreenImage = (uri: string) => {
         setFullScreenImage(uri);
     };
+
+    function getImageUri(image?: string) {
+        if (!image) return null;
+        if (image.startsWith("data:image")) return image;
+        return `${API_BASE_URL}/${image}`;
+    }
 
     return (
         <View style={styles.container}>
@@ -212,13 +220,20 @@ export function PrivatChat() {
                             alignItems: "center",
                         }}
                     >
-                        <Image
-                            source={{ uri: API_BASE_URL + "/" + params.avatar }}
-                            style={styles.avatar}
-                        />
+                        {companion.avatar === undefined ? (
+                            <Image
+                                source={require("../../../../shared/ui/images/avatar.png")}
+                                style={styles.avatar}
+                            />
+                        ) : (
+                            <Image
+                                source={{ uri: API_BASE_URL + "/" + companion.avatar }}
+                                style={styles.avatar}
+                            />
+                        )}
                         <View style={{}}>
-                            <Text style={styles.chatName}>{params.name}</Text>
-                            <Text style={styles.chatInfo}>@{params.username}</Text>
+                            <Text style={styles.chatName}>{companion.name}</Text>
+                            <Text style={styles.chatInfo}>@{companion.username}</Text>
                         </View>
                     </View>
                 </View>
@@ -270,8 +285,12 @@ export function PrivatChat() {
                                 >
                                     {!isMyMessage && (
                                         <Image
-                                            source={{ uri: API_BASE_URL + "/" + params.avatar }}
-                                            style={{ width: 40, height: 40, borderRadius: 12345 }}
+                                            style={styles.avatar}
+                                            source={
+                                                companion.avatar
+                                                    ? { uri: `${API_BASE_URL}/${companion.avatar}` }
+                                                    : require("../../../../shared/ui/images/avatar.png")
+                                            }
                                         />
                                     )}
                                     <View
@@ -284,24 +303,28 @@ export function PrivatChat() {
                                         {msg.attached_image && (
                                             <TouchableOpacity
                                                 onPress={() =>
-                                                    showFullScreenImage(msg.attached_image)
+                                                    showFullScreenImage(
+                                                        getImageUri(msg.attached_image)!,
+                                                    )
                                                 }
                                             >
                                                 <Image
-                                                    source={{ uri: msg.attached_image }}
-                                                    style={[
-                                                        styles.messageImage,
-                                                        {
-                                                            width: 150,
-                                                            height: 150,
-                                                            borderRadius: 8,
-                                                        },
-                                                    ]}
+                                                    source={{
+                                                        uri: getImageUri(msg.attached_image)!,
+                                                    }}
+                                                    style={{
+                                                        width: 150,
+                                                        height: 150,
+                                                        borderRadius: 8,
+                                                    }}
                                                     resizeMode="cover"
                                                 />
                                             </TouchableOpacity>
                                         )}
-                                        <Text style={styles.messageText}>{msg.content}</Text>
+
+                                        {msg.content ? (
+                                            <Text style={styles.messageText}>{msg.content}</Text>
+                                        ) : null}
                                         <View style={styles.messageBox}>
                                             <Text style={styles.messageTime}>
                                                 {new Date(msg.sent_at).toLocaleTimeString([], {
@@ -321,9 +344,12 @@ export function PrivatChat() {
 
             {selectedImages.length > 0 && (
                 <ScrollView
-                    horizontal
-                    style={styles.selectedImagesContainer}
-                    showsHorizontalScrollIndicator={false}
+                    style={[styles.selectedImagesContainer, { flexGrow: 0 }]}
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
                 >
                     {selectedImages.map((img, index) => (
                         <View key={index} style={styles.previewImageWrapper}>
@@ -347,7 +373,9 @@ export function PrivatChat() {
                                         alignItems: "center",
                                     },
                                 ]}
-                                onPress={() => removeImage(index)}
+                                onPress={() =>
+                                    setSelectedImages(prev => prev.filter((_, i) => i !== index))
+                                }
                             >
                                 <Text
                                     style={[
@@ -363,7 +391,7 @@ export function PrivatChat() {
                 </ScrollView>
             )}
 
-            <View style={[styles.inputContainer, { paddingBottom: 10 }]}>
+            <View style={[styles.inputContainer, { paddingBottom: 10, marginTop: 8 }]}>
                 <TextInput
                     style={[styles.input, { flex: 1, borderRadius: 20, paddingHorizontal: 15 }]}
                     placeholder="Повідомлення"

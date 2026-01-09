@@ -159,18 +159,39 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
                         : `${API_BASE_URL}/${img.image.filename.replace(/^\/+/, "")}`;
                     return (
                         <View key={img.image.id} style={styles.imageContainer}>
-                            <Image
-                                source={{ uri: correctImage }}
-                                style={styles.imageAdded}
-                                resizeMode="cover"
-                                onError={error => {
-                                    console.log(
-                                        "Помилка завантаження зображення:",
-                                        error.nativeEvent,
-                                    );
-                                    Alert.alert("Помилка", "Не вдалося завантажити зображення.");
-                                }}
-                            />
+                            {correctImage.slice(-8) === "user.png" ? (
+                                <Image
+                                    source={require("../../../../shared/ui/images/user.png")}
+                                    style={styles.imageAdded}
+                                    resizeMode="cover"
+                                    onError={error => {
+                                        console.log(
+                                            "Помилка завантаження зображення:",
+                                            error.nativeEvent,
+                                        );
+                                        Alert.alert(
+                                            "Помилка",
+                                            "Не вдалося завантажити зображення.",
+                                        );
+                                    }}
+                                />
+                            ) : (
+                                <Image
+                                    source={{ uri: correctImage }}
+                                    style={styles.imageAdded}
+                                    resizeMode="cover"
+                                    onError={error => {
+                                        console.log(
+                                            "Помилка завантаження зображення:",
+                                            error.nativeEvent,
+                                        );
+                                        Alert.alert(
+                                            "Помилка",
+                                            "Не вдалося завантажити зображення.",
+                                        );
+                                    }}
+                                />
+                            )}
                             {user?.id === props.author_id ? (
                                 <TouchableOpacity
                                     style={styles.removeImageButton}

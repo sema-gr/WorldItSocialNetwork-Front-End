@@ -79,14 +79,22 @@ export function FriendsForm(props: FriendsFormProps) {
             console.log(error.message);
         }
     }
+    // console.log(props.image);
 
     return (
         <TouchableOpacity style={[styles.container, { flexShrink: 0 }]} onPress={onPress}>
             <View style={styles.profileContainer}>
-                <Image
-                    style={styles.profileImage}
-                    source={{ uri: API_BASE_URL + "/" + props.image }}
-                />
+                {props.image === null ? (
+                    <Image
+                        style={styles.profileImage}
+                        source={require("../../../../shared/ui/images/avatar.png")}
+                    />
+                ) : (
+                    <Image
+                        style={styles.profileImage}
+                        source={{ uri: API_BASE_URL + "/" + props.image }}
+                    />
+                )}
                 <OfflineIcon style={styles.imageOnline} />
             </View>
 

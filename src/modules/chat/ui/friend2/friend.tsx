@@ -6,16 +6,32 @@ interface IFriendProps {
     user: {
         name: string;
         surname?: string;
-        image: string;
+        image?: string;
     };
     lastMessage?: string;
     timeMessage?: string;
+    groupChat?: boolean;
 }
 
 export function Friend2(props: IFriendProps) {
     return (
         <View style={styles.container}>
-            <Image source={{ uri: `${API_BASE_URL}/${props.user?.image}` }} style={styles.avatar} />
+            {props.groupChat ? (
+                <Image
+                    source={require("../../../../shared/ui/images/user.png")}
+                    style={styles.avatar}
+                />
+            ) : props.user?.image === null ? (
+                <Image
+                    source={require("../../../../shared/ui/images/avatar.png")}
+                    style={styles.avatar}
+                />
+            ) : (
+                <Image
+                    source={{ uri: `${API_BASE_URL}/${props.user?.image}` }}
+                    style={styles.avatar}
+                />
+            )}
             <View style={styles.textBox}>
                 <View style={styles.messageBox}>
                     {props.user?.surname ? (

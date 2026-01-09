@@ -205,10 +205,19 @@ export function My(props: IAlbumProps) {
                     {images.length > 0 ? (
                         [...images].map(image => (
                             <View key={image.image.id} style={styles.imageWrapper}>
-                                <Image
-                                    source={normalizeImageUrl(image.image.filename)}
-                                    style={styles.avatar}
-                                />
+                                {normalizeImageUrl(images.at(0)?.image.filename)?.uri.slice(-8) ===
+                                "user.png" ? (
+                                    <Image
+                                        source={require("../../../../shared/ui/images/user.png")}
+                                        style={styles.avatar}
+                                    />
+                                ) : (
+                                    <Image
+                                        source={normalizeImageUrl(image.image.filename)}
+                                        style={styles.avatar}
+                                    />
+                                )}
+
                                 <View style={styles.actionButtons}>
                                     <TouchableOpacity style={styles.actionButton}>
                                         <Image

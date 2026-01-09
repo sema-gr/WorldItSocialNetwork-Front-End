@@ -8,6 +8,8 @@ import {
     ScrollView,
     Platform,
     Alert,
+    Modal,
+    Dimensions,
 } from "react-native";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
@@ -104,19 +106,26 @@ export function Group() {
         };
     }, [socket, params.chat_id, isMounted]);
 
-    const sendMessage = () => {
-        if (!socket || !input.trim() || !user) return;
+    const sendMessage = async () => {
+        if ((!input.trim() && selectedImages.length === 0) || !user || !socket) return;
 
-        const newMessage: CreateMessage = {
-            content: input.trim(),
-            author_id: user.id,
-            chat_groupId: +params.chat_id,
-            sent_at: new Date(),
-            attached_image: "",
-        };
+        try {
+            const newMessage: CreateMessage = {
+                content: input.trim(),
+                author_id: user.id,
+                chat_groupId: +params.chat_id,
+                sent_at: new Date(),
+                attached_image: selectedImages[0] || "",
+            };
 
-        socket.emit("sendMessage", newMessage as MessagePayload);
-        setInput("");
+            socket.emit("sendMessage", newMessage as MessagePayload);
+
+            setInput("");
+            setSelectedImages([]);
+        } catch (error) {
+            Alert.alert("Error", "Could not send message");
+            console.log("Send message error:", error);
+        }
     };
 
     const pickImage = async () => {
@@ -185,6 +194,12 @@ export function Group() {
     const showFullScreenImage = (uri: string) => {
         setFullScreenImage(uri);
     };
+
+    function getImageUri(image?: string) {
+        if (!image) return null;
+        if (image.startsWith("data:image")) return image;
+        return `${API_BASE_URL}/${image}`;
+    }
 
     return (
         <View style={styles.container}>
@@ -257,9 +272,11 @@ export function Group() {
                                     >
                                         {!isMyMessage && (
                                             <Image
-                                                source={{
-                                                    uri: avatarsMap[msg.author_id],
-                                                }}
+                                                source={
+                                                    avatarsMap[msg.author_id].slice(-4) === "null"
+                                                        ? require("../../../../shared/ui/images/avatar.png")
+                                                        : { uri: avatarsMap[msg.author_id] }
+                                                }
                                                 style={{
                                                     width: 40,
                                                     height: 40,
@@ -277,24 +294,30 @@ export function Group() {
                                             {msg.attached_image && (
                                                 <TouchableOpacity
                                                     onPress={() =>
-                                                        showFullScreenImage(msg.attached_image)
+                                                        showFullScreenImage(
+                                                            getImageUri(msg.attached_image)!,
+                                                        )
                                                     }
                                                 >
                                                     <Image
-                                                        source={{ uri: msg.attached_image }}
-                                                        style={[
-                                                            styles.messageImage,
-                                                            {
-                                                                width: 150,
-                                                                height: 150,
-                                                                borderRadius: 8,
-                                                            },
-                                                        ]}
+                                                        source={{
+                                                            uri: getImageUri(msg.attached_image)!,
+                                                        }}
+                                                        style={{
+                                                            width: 150,
+                                                            height: 150,
+                                                            borderRadius: 8,
+                                                        }}
                                                         resizeMode="cover"
                                                     />
                                                 </TouchableOpacity>
                                             )}
-                                            <Text style={styles.messageText}>{msg.content}</Text>
+                                            {msg.content ? (
+                                                <Text style={styles.messageText}>
+                                                    {msg.content}
+                                                </Text>
+                                            ) : null}
+
                                             <View style={styles.messageBox}>
                                                 <Text style={styles.messageTime}>
                                                     {new Date(msg.sent_at).toLocaleTimeString([], {
@@ -315,9 +338,12 @@ export function Group() {
 
             {selectedImages.length > 0 && (
                 <ScrollView
-                    horizontal
-                    style={styles.selectedImagesContainer}
-                    showsHorizontalScrollIndicator={false}
+                    style={[styles.selectedImagesContainer, { flexGrow: 0 }]} // Дозволяє стискатися
+                    contentContainerStyle={{
+                        flexGrow: 1, // Залишаємо для центрування контенту, якщо він є
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
                 >
                     {selectedImages.map((img, index) => (
                         <View key={index} style={styles.previewImageWrapper}>
@@ -376,6 +402,42 @@ export function Group() {
                     <SendArrow style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                visible={!!fullScreenImage}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setFullScreenImage(null)}
+            >
+                <View
+                    style={{
+                        flex: 1,
+                        backgroundColor: "rgba(0,0,0,0.9)",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
+                    <TouchableOpacity
+                        style={{
+                            position: "absolute",
+                            top: 40,
+                            right: 20,
+                            zIndex: 1000,
+                        }}
+                        onPress={() => setFullScreenImage(null)}
+                    >
+                        <Text style={{ color: "#fff", fontSize: 24 }}>×</Text>
+                    </TouchableOpacity>
+                    <Image
+                        source={{ uri: fullScreenImage || "" }}
+                        style={{
+                            width: Dimensions.get("window").width,
+                            height: Dimensions.get("window").height * 0.8,
+                            resizeMode: "contain",
+                        }}
+                    />
+                </View>
+            </Modal>
 
             <ModalForDeleteGroup
                 visible={modalVisible}

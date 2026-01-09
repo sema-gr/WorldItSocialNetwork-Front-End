@@ -16,9 +16,10 @@ import { AddFriendModal } from "../../../modules/chat/ui/modals/createGroupModal
 
 interface HeaderProps {
     actionType?: 1 | 2 | 3; // 1 пости, 2 альбоми, 3 групові чати
+    settings?: boolean;
 }
 
-function Header({ actionType }: HeaderProps) {
+function Header({ actionType, settings }: HeaderProps) {
     const router = useRouter();
     const { user, logout } = useUserContext();
     const [modalOpened, setModalOpened] = useState<boolean>(false);
@@ -84,12 +85,14 @@ function Header({ actionType }: HeaderProps) {
                         />
                     </TouchableWithoutFeedback>
                 ) : null}
-                <TouchableWithoutFeedback onPress={onReg}>
-                    <Image
-                        style={styles.settings}
-                        source={require("../images/settings-in-circle.png")}
-                    />
-                </TouchableWithoutFeedback>
+                {settings && (
+                    <TouchableWithoutFeedback onPress={onReg}>
+                        <Image
+                            style={styles.settings}
+                            source={require("../images/settings-in-circle.png")}
+                        />
+                    </TouchableWithoutFeedback>
+                )}
                 <TouchableWithoutFeedback onPress={logout}>
                     <Image style={styles.exit} source={require("../images/exit-in-circle.png")} />
                 </TouchableWithoutFeedback>

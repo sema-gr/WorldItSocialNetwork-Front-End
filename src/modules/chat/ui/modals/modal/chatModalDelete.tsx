@@ -61,7 +61,7 @@ export function ChatModalDelete({
     const adjustedY = dotsPosition?.y ? dotsPosition.y - scrollOffset + 3 : 0;
     const clampedY = Math.min(Math.max(adjustedY, 10), screenHeight - modalHeight - 10);
 
-    async function handleDelete(chatId: number) {
+    async function handleDeleteMessages(chatId: number) {
         if (!tokenUser) {
             Alert.alert("Помилка", "Не вдалося отримати токен користувача");
             return;
@@ -142,7 +142,7 @@ export function ChatModalDelete({
 
                     <TouchableOpacity
                         style={styles.modalOption}
-                        onPress={() => handleDelete(chat_id)}
+                        onPress={() => handleDeleteMessages(chat_id)}
                         disabled={isDeleting}
                     >
                         {isDeleting ? (

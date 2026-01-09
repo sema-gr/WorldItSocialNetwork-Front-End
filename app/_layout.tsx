@@ -34,7 +34,7 @@ export default function RootLayout() {
                         name="settings"
                         options={{
                             contentStyle: { backgroundColor: "#ffffff", flex: 1, marginTop: 30 },
-                            header: () => <Header actionType={2} />,
+                            header: () => <Header actionType={2} settings={false} />,
                         }}
                     />
                 </Stack>

@@ -121,14 +121,14 @@ export const styles = StyleSheet.create({
         marginBottom: 8,
     },
     selectedImagesContainer: {
-        flexDirection: "row",
         padding: 10,
         backgroundColor: "#f5f5f5ff",
+        minHeight: 220,
     },
     previewImageWrapper: {
-        height: 0,
         position: "relative",
-        marginRight: 20,
+        justifyContent: "center",
+        alignItems: "center",
     },
     selectedImage: {
         width: 200,

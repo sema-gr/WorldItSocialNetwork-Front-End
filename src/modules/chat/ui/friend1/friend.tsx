@@ -53,14 +53,19 @@ export function Friend1({
     return (
         <TouchableOpacity onPress={onPress}>
             <View style={styles.container}>
-                <Image
-                    source={{
-                        uri:
-                            API_BASE_URL + "/" + userContact?.image ||
-                            "../../../../shared/ui/images/user.png",
-                    }}
-                    style={styles.avatar}
-                />
+                {userContact?.image === null ? (
+                    <Image
+                        source={require("../../../../shared/ui/images/avatar.png")}
+                        style={styles.avatar}
+                    />
+                ) : (
+                    <Image
+                        source={{
+                            uri: API_BASE_URL + "/" + userContact?.image,
+                        }}
+                        style={styles.avatar}
+                    />
+                )}
                 <View style={{ flexDirection: "row", gap: 4 }}>
                     <Text style={styles.name}>{userContact?.name || "Anonymous"}</Text>
                     <Text style={styles.name}>{userContact?.surname || "Anonymous"}</Text>
