@@ -1,47 +1,45 @@
 {
-  "expo": {
-    "name": "WorldItSocialNetwork",
-    "scheme": "worlditsocialnetwork",
-    "slug": "WorldItSocialNetwork",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "softwareKeyboardLayoutMode": "pan",
-      "package": "com.serjik.WorldItSocialNetwork"
-    },
-    "web": {
-      "build": {
-        "babel": {
-          "include": []
+    "expo": {
+        "name": "WorldItSocialNetwork",
+        "scheme": "worlditsocialnetwork",
+        "slug": "WorldItSocialNetwork",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "userInterfaceStyle": "light",
+        "newArchEnabled": true,
+        "splash": {
+            "image": "./assets/splash-icon.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
         },
-        "output": "web-build",
-        "publicPath": "./"
-      },
-      "bundler": "metro",
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-router"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "b6077335-877f-43d9-99e2-d72888713988"
-      }
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/adaptive-icon.png",
+                "backgroundColor": "#ffffff"
+            },
+            "softwareKeyboardLayoutMode": "pan",
+            "package": "com.serjik.WorldItSocialNetwork"
+        },
+        "web": {
+            "build": {
+                "babel": {
+                    "include": []
+                },
+                "output": "web-build",
+                "publicPath": "./"
+            },
+            "bundler": "metro",
+            "favicon": "./assets/favicon.png"
+        },
+        "plugins": ["expo-router"],
+        "extra": {
+            "eas": {
+                "projectId": "b6077335-877f-43d9-99e2-d72888713988"
+            }
+        }
     }
-  }
 }

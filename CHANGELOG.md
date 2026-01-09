@@ -1,9 +1,8 @@
 # [1.1.0](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.0.1...v1.1.0) (2026-01-08)
 
-
 ### Features
 
-* enhance chat functionality with image handling, group deletion modal, and user profile updates ([03f96c9](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/03f96c9b5e9f4757ed7a4d9996b168811613ec63))
+- enhance chat functionality with image handling, group deletion modal, and user profile updates ([03f96c9](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/03f96c9b5e9f4757ed7a4d9996b168811613ec63))
 
 ## [1.0.1](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.0.0...v1.0.1) (2026-01-04)
 
