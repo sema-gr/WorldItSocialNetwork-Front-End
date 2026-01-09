@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.1.0...v1.2.0) (2026-01-09)
+
+
+### Bug Fixes
+
+* change not important files ([881a14d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/881a14dad115b3cdc1c86b9dd251537c8badce32))
+
+
+### Features
+
+* update image handling across components and add error handling for image loading ([fe72d81](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/fe72d812edca06efe59efde146c6f7a63008fcbe))
+
 # [1.1.0](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.0.1...v1.1.0) (2026-01-08)
 
 ### Features
