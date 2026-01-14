@@ -51,6 +51,19 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Expo / React Native
+node_modules/
+.expo/
+.expo-shared/
+android/
+ios/
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+*.orig.*
+web-build/
+
 # Native
 *.orig.*
 *.jks

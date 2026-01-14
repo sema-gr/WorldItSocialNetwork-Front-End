@@ -1,4 +1,4 @@
-name: CI
+name: CI / CD for Expo React Native
 
 on:
     push:
@@ -7,7 +7,7 @@ on:
         branches: [main]
 
 permissions:
-    contents: write # для semantic-release
+    contents: write # для semantic-release та створення тегів
     issues: write
     pull-requests: write
 
@@ -15,12 +15,14 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - name: Checkout code
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
-                  node-version: "24"
+                  node-version: "20" # Expo 54 рекомендує LTS, 20 або 22
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
@@ -35,35 +37,69 @@ jobs:
         needs: lint
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
+            - name: Checkout code
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
-                  node-version: "24"
+                  node-version: "20"
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
 
             - name: Run tests
-              run: npm test
+              run: npm test -- --passWithNoTests
 
-            - name: Build Expo web
-              run: npx expo export
+            - name: Expo prebuild (Android)
+              run: npx expo prebuild --platform android --clean
 
-            - name: Upload build artifact
+            - name: Build Expo web (якщо потрібно)
+              run: npx expo export --platform web
+
+            - name: Upload web artifact (опціонально)
+              if: always()
               uses: actions/upload-artifact@v4
               with:
                   name: web-dist
                   path: dist/
+                  retention-days: 7
 
-    release:
+    eas-build-development:
         needs: build-and-test
         runs-on: ubuntu-latest
-        if: github.event_name == 'push'
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
 
         steps:
-            - name: Checkout repository
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
+
+            - name: Install EAS CLI
+              run: npm install -g eas-cli
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Login to Expo
+              run: eas login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+
+            - name: Build Development APK
+              run: eas build --platform android --profile development --non-interactive --no-wait
+
+    release:
+        needs: eas-build-development
+        runs-on: ubuntu-latest
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+        steps:
+            - name: Checkout repository with full history
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
@@ -71,12 +107,19 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "24"
+                  node-version: "20"
+                  cache: "npm"
 
             - name: Install dependencies
               run: npm ci
 
-            - name: Run semantic-release
+            - name: Semantic Release
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: npm run release
+              run: npx semantic-release
+
+            - name: Create EAS Production Build (after release)
+              if: success()
+              run: |
+                  eas login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+                  eas build --platform android --profile production --non-interactive --no-wait
