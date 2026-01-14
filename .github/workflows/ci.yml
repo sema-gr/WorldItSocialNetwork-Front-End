@@ -90,7 +90,7 @@ jobs:
               env:
                   EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
                   EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
-              run: eas login
+              run: eas login --non-interactive
 
             - name: Build Development APK
               run: eas build --platform android --profile development --non-interactive --no-wait
