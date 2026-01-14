@@ -21,7 +21,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "20" # Expo 54 рекомендує LTS, 20 або 22
+                  node-version: "20"
                   cache: "npm"
 
             - name: Install dependencies
@@ -86,13 +86,9 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Login to Expo
+            - name: Build Development APK with EAS
               env:
-                  EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
-                  EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
-              run: eas login --non-interactive
-
-            - name: Build Development APK
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
               run: eas build --platform android --profile development --non-interactive --no-wait
 
     release:
@@ -122,8 +118,5 @@ jobs:
             - name: Create EAS Production Build (after release)
               if: success()
               env:
-                  EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
-                  EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
-              run: |
-                  eas login
-                  eas build --platform android --profile production --non-interactive --no-wait
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+              run: eas build --platform android --profile production --non-interactive --no-wait
