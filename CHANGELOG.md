@@ -1,10 +1,9 @@
 ## [1.2.2](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.1...v1.2.2) (2026-01-14)
 
-
 ### Bug Fixes
 
-* add to install eas cli in ci before release ([35d3161](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/35d316115f29f8461f4a2b7069a09d6fdcd013eb))
-* changelog ([fdd283d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/fdd283d0c999fce175086c47af8bab21293d4751))
+- add to install eas cli in ci before release ([35d3161](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/35d316115f29f8461f4a2b7069a09d6fdcd013eb))
+- changelog ([fdd283d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/fdd283d0c999fce175086c47af8bab21293d4751))
 
 ## [1.2.1](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.0...v1.2.1) (2026-01-14)
 
