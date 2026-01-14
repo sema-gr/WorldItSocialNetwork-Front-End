@@ -70,7 +70,6 @@ jobs:
         needs: build-and-test
         runs-on: ubuntu-latest
         if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
@@ -88,7 +87,10 @@ jobs:
               run: npm ci
 
             - name: Login to Expo
-              run: eas login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+              env:
+                  EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
+                  EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
+              run: eas login
 
             - name: Build Development APK
               run: eas build --platform android --profile development --non-interactive --no-wait
@@ -97,7 +99,6 @@ jobs:
         needs: eas-build-development
         runs-on: ubuntu-latest
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
         steps:
             - name: Checkout repository with full history
               uses: actions/checkout@v4
@@ -120,6 +121,9 @@ jobs:
 
             - name: Create EAS Production Build (after release)
               if: success()
+              env:
+                  EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
+                  EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
               run: |
-                  eas login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+                  eas login
                   eas build --platform android --profile production --non-interactive --no-wait
