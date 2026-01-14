@@ -66,7 +66,7 @@ export default function Register() {
                         </View>
                         <View
                             style={{
-                                width: screenWidth - 40,
+                                // width: screenWidth - 40,
                                 alignItems: "center",
                                 justifyContent: "center",
                             }}

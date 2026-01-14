@@ -82,7 +82,7 @@ export function LoginFormOne() {
                 />
             </View>
             <Button label={"Увійти"} onPress={handleSubmit(onNext)} />
-            <Text>-- або увійдіть за допомогою QR-коду --</Text>
+            {/* <Text>-- або увійдіть за допомогою QR-коду --</Text> */}
         </View>
     );
 }

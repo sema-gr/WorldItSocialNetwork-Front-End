@@ -13,7 +13,7 @@ import { styles } from "./settings.styles";
 import { useUserContext } from "../auth/context/user-context";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { SignaturePad, SignaturePadRef } from "./signature/signature";
+import { SignaturePadRef } from "./signature/signature";
 import PencilIcon from "../../shared/ui/icons/pencil";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -480,7 +480,7 @@ export function Settings() {
                     </View>
                 </View>
 
-                <View style={styles.container}>
+                {/* <View style={styles.container}>
                     <View style={styles.userInfoFirst}>
                         <Text style={styles.userInfoText}>Варіанти підпису</Text>
                         <Image
@@ -527,7 +527,7 @@ export function Settings() {
                             />
                         </View>
                     </View>
-                </View>
+                </View> */}
             </View>
         </ScrollView>
     );

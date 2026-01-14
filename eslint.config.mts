@@ -5,6 +5,15 @@ import pluginReact from "eslint-plugin-react";
 import unusedImports from "eslint-plugin-unused-imports";
 import { defineConfig } from "eslint/config";
 
+const nodeGlobals = {
+    require: "readonly",
+    module: "readonly",
+    __dirname: "readonly",
+    __filename: "readonly",
+    process: "readonly",
+    global: "readonly",
+};
+
 export default defineConfig([
     {
         ignores: [
@@ -34,12 +43,22 @@ export default defineConfig([
         languageOptions: {
             globals: {
                 ...globals.browser,
+                ...nodeGlobals,
                 __d: "readonly",
                 __r: "readonly",
+            },
+            parserOptions: {
+                ecmaVersion: 2021,
+                sourceType: "module",
             },
         },
         rules: {
             "no-unused-vars": "off",
+        },
+        settings: {
+            react: {
+                version: "detect",
+            },
         },
     },
     {
@@ -48,8 +67,13 @@ export default defineConfig([
         extends: [tseslint.configs.recommended, pluginReact.configs.flat.recommended],
         languageOptions: {
             globals: {
+                ...nodeGlobals,
                 __d: "readonly",
                 __r: "readonly",
+            },
+            parserOptions: {
+                ecmaVersion: 2021,
+                sourceType: "module",
             },
         },
         rules: {
@@ -64,6 +88,11 @@ export default defineConfig([
             "@typescript-eslint/no-unused-expressions": "off",
             "react/no-unescaped-entities": "warn",
             "react/display-name": "warn",
+        },
+        settings: {
+            react: {
+                version: "detect",
+            },
         },
     },
 ]);
