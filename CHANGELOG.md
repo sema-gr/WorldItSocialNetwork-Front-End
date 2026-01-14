@@ -1,11 +1,10 @@
 ## [1.2.1](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.0...v1.2.1) (2026-01-14)
 
-
 ### Bug Fixes
 
-* delete Log Expo ([f06aef9](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/f06aef9a5da98bd832e307e78eb47b90d9709f14))
-* update ci ([232ba65](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/232ba65fc825d9c0c220b2d9126e326b2fbce463))
-* upgrade ci ([9514f0d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/9514f0d10387abf1bec23114010c0a8bc205ef5e))
+- delete Log Expo ([f06aef9](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/f06aef9a5da98bd832e307e78eb47b90d9709f14))
+- update ci ([232ba65](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/232ba65fc825d9c0c220b2d9126e326b2fbce463))
+- upgrade ci ([9514f0d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/9514f0d10387abf1bec23114010c0a8bc205ef5e))
 
 # [1.2.0](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.1.0...v1.2.0) (2026-01-09)
 
