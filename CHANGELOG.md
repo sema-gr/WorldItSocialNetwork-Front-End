@@ -1,3 +1,11 @@
+## [1.2.7](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.6...v1.2.7) (2026-01-16)
+
+
+### Bug Fixes
+
+* changelog ([05f4082](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/05f4082bd068e14cc276ff47c7ad0078b5a5d1b9))
+* ci ([27c284a](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/27c284a93609797c66f63d66a6b723cac8522c4f))
+
 ## [1.2.6](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.5...v1.2.6) (2026-01-16)
 
 ### Bug Fixes
