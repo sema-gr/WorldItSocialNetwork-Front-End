@@ -1,3 +1,13 @@
+## [1.2.3](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.2...v1.2.3) (2026-01-16)
+
+
+### Bug Fixes
+
+* add download apk ([058a3a4](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/058a3a404ca6e5fb061b51ff40137487a8f82bce))
+* changelog ([877fc80](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/877fc80c5616729b50061ec78df023bda3554451))
+* replace style ([1c47f4f](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/1c47f4fb9b3ea37f4d2761fe311501a7eeaa9416))
+* update ci, add vercel connection ([5d444ab](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/5d444ab9e00ee8151815cb88ff95ac26b0d45998))
+
 ## [1.2.2](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.1...v1.2.2) (2026-01-14)
 
 ### Bug Fixes
