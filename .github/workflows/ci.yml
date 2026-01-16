@@ -52,9 +52,8 @@ jobs:
                   URL=$(vercel deploy dist --prod --token=$VERCEL_TOKEN | tail -n 1)
                   echo "url=$URL" >> $GITHUB_OUTPUT
 
-            - name: Deployment URL
-              run: |
-                  echo "🌍 Web deployed to: ${{ steps.vercel_deploy.outputs.url }}"
+            - name: Show deployed URL
+              run: echo "🌍 Web deployed at ${{ steps.vercel_deploy.outputs.url }}"
 
     build-android-prod:
         needs: lint-and-test
