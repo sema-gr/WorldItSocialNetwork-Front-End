@@ -14,12 +14,10 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-
             - uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
-
             - run: npm ci
             - run: npm run lint
             - run: npm run prettier:check
@@ -30,7 +28,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-
             - uses: actions/setup-node@v4
               with:
                   node-version: "20"
@@ -39,9 +36,9 @@ jobs:
             - run: npm ci
 
             - name: Build Expo Web
-              run: npx expo export -p web
+              run: npm run build
 
-            - name: Deploy Web to Vercel (Production)
+            - name: Deploy to Vercel
               id: vercel_deploy
               env:
                   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -49,7 +46,7 @@ jobs:
                   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               run: |
                   npm install -g vercel
-                  URL=$(vercel deploy dist --prod --token=$VERCEL_TOKEN | tail -n 1)
+                  URL=$(vercel --prod --token=$VERCEL_TOKEN --yes | grep -o 'https://[^ ]*' | head -n 1)
                   echo "url=$URL" >> $GITHUB_OUTPUT
 
             - name: Show deployed URL
@@ -60,45 +57,30 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-
             - uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
-
             - run: npm ci
             - run: npm install -g eas-cli
-
             - name: Run EAS Android Production Build
               env:
                   EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
               run: |
-                  eas build --platform android --profile production --non-interactive --json > build.json
-
-            - name: Upload Android Artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: android-build
-                  path: build.json
-                  retention-days: 14
+                  eas build --platform android --profile production --non-interactive --no-wait
 
     release:
-        needs:
-            - build-web-and-deploy
-            - build-android-prod
+        needs: [build-web-and-deploy, build-android-prod]
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
-
             - uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
-
             - run: npm ci
-
             - name: Semantic Release
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
