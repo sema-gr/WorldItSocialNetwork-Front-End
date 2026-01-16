@@ -1,3 +1,12 @@
+## [1.2.6](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.5...v1.2.6) (2026-01-16)
+
+
+### Bug Fixes
+
+* change changelog ([ad42481](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/ad4248185a198e550d70846e9f9cf999da6d1f61))
+* vercel ([9650601](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/9650601325f421c931a6827906b61effc5b89a38))
+* vercel ([b885faa](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/b885faa2caaf4dec1554476891f4a153d1cde01a))
+
 ## [1.2.5](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/compare/v1.2.4...v1.2.5) (2026-01-16)
 
 ### Bug Fixes
