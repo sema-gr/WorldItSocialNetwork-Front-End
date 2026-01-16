@@ -1,159 +1,100 @@
-name: CI / CD for Expo React Native
+name: CI / CD (Production)
 
 on:
     push:
         branches: [main]
-    pull_request:
-        branches: [main]
 
 permissions:
-    contents: write # для semantic-release та створення тегів
+    contents: write
     issues: write
     pull-requests: write
 
 jobs:
-    lint:
+    lint-and-test:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
+            - uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
 
-            - name: Install dependencies
-              run: npm ci
+            - run: npm ci
+            - run: npm run lint
+            - run: npm run prettier:check
+            - run: npm test -- --passWithNoTests
 
-            - name: Run ESLint
-              run: npm run lint
-
-            - name: Run Prettier check
-              run: npm run prettier:check
-
-    build-and-test:
-        needs: lint
+    build-web-and-deploy:
+        needs: lint-and-test
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
+            - uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
 
-            - name: Install dependencies
-              run: npm ci
+            - run: npm ci
 
-            - name: Run tests
-              run: npm test -- --passWithNoTests
+            - name: Build Expo Web
+              run: npx expo export -p web
 
-            - name: Expo prebuild (Android)
-              run: npx expo prebuild --platform android --clean
+            - name: Deploy Web to Vercel (Production)
+              env:
+                  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+                  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+              run: |
+                  npm install -g vercel
+                  vercel deploy dist --prod --token=$VERCEL_TOKEN
 
-            - name: Build Expo web (якщо потрібно)
-              run: npx expo export --platform web
+    build-android-prod:
+        needs: lint-and-test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-            - name: Upload web artifact (опціонально)
-              if: always()
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
+
+            - run: npm ci
+            - run: npm install -g eas-cli
+
+            - name: Run EAS Android Production Build
+              env:
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+              run: |
+                  eas build --platform android --profile production --non-interactive --json > build.json
+
+            - name: Upload Android Artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: web-dist
-                  path: dist/
-                  retention-days: 7
-
-    eas-build-development:
-        needs: build-and-test
-        runs-on: ubuntu-latest
-        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "20"
-                  cache: "npm"
-
-            - name: Install EAS CLI
-              run: npm install -g eas-cli
-
-            - name: Install dependencies
-              run: npm ci
-
-            - name: Run EAS Build (wait for finish)
-              env:
-                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-              id: eas_build
-              run: |
-                  eas build --platform android --profile development --non-interactive
-
-            - name: Get last build info
-              env:
-                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-              id: get_build
-              run: |
-                  BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
-                  echo "BUILD_ID=$BUILD_ID" >> $GITHUB_OUTPUT
-
-            - name: Get build details
-              env:
-                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-              id: build_details
-              run: |
-                  DETAILS=$(eas build:inspect --platform android --id ${{ steps.get_build.outputs.BUILD_ID }} --json)
-                  echo "DETAILS=$DETAILS" >> $GITHUB_OUTPUT
-
-            - name: Extract APK URL
-              id: apk_url
-              run: |
-                  echo "apk_url=$(echo '${{ steps.build_details.outputs.DETAILS }}' | jq -r '.artifacts.buildUrl')" >> $GITHUB_OUTPUT
-
-            - name: Download APK
-              run: |
-                  curl -o app.apk "${{ steps.apk_url.outputs.apk_url }}"
-
-            - name: Upload APK artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: android-apk
-                  path: app.apk
-                  retention-days: 7
+                  name: android-build
+                  path: build.json
+                  retention-days: 14
 
     release:
-        needs: eas-build-development
+        needs:
+            - build-web-and-deploy
+            - build-android-prod
         runs-on: ubuntu-latest
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         steps:
-            - name: Checkout repository with full history
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
+            - uses: actions/setup-node@v4
               with:
                   node-version: "20"
                   cache: "npm"
 
-            - name: Install dependencies
-              run: npm ci
-
-            - name: Install EAS CLI
-              run: npm install -g eas-cli
+            - run: npm ci
 
             - name: Semantic Release
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: npx semantic-release
-
-            - name: Create EAS Production Build (after release)
-              if: success()
-              env:
-                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-              run: eas build --platform android --profile production --non-interactive --no-wait
